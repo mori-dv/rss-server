@@ -16,8 +16,8 @@
 
 RSS
 .env
-
-
+.DS_Store/
+.DS_Store
 
 ### Go template
 # If you prefer the allow list template instead of the deny list, see community template:
