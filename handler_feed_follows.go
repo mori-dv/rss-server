@@ -3,13 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/mori-dv/RSS/internal/database"
 	"net/http"
 	"time"
 )
 
-func (apicfg *apiConfig) handlerCreateFeedFollow(w http.ResponseWriter, r *http.Request, user database.User) {
+func (apicfg *apiConfig) handlerCreateFeedFollows(w http.ResponseWriter, r *http.Request, user database.User) {
 	type parameters struct {
 		FeedID uuid.UUID `json:"feed_id"`
 	}
@@ -42,4 +43,21 @@ func (apicfg *apiConfig) handlerGetAllFeedFollows(w http.ResponseWriter, r *http
 	}
 	responseWithJSON(w, http.StatusOK, databaseFeedFollowsToFeedFollows(follows))
 
+}
+
+func (apicfg *apiConfig) handlerDeleteFeedFollows(w http.ResponseWriter, r *http.Request, user database.User) {
+	feedID, err := uuid.Parse(chi.URLParam(r, "feedFollowsID"))
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest, fmt.Sprintf("invalid feed ID: %v", err))
+		return
+	}
+	err = apicfg.DB.DeleteFeedFollows(r.Context(), database.DeleteFeedFollowsParams{
+		FeedID: feedID,
+		UserID: user.ID,
+	})
+	if err != nil {
+		responseWithError(w, http.StatusInternalServerError, fmt.Sprintf("connot delete feed follows: %v", err))
+		return
+	}
+	responseWithJSON(w, http.StatusNoContent, nil)
 }

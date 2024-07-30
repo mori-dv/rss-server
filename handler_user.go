@@ -44,14 +44,3 @@ func (apicfg *apiConfig) handlerGetAllUsers(w http.ResponseWriter, r *http.Reque
 	}
 	responseWithJSON(w, http.StatusOK, databaseUserToUsers(users))
 }
-
-func (apicfg *apiConfig) handlerDeleteUser(w http.ResponseWriter, r *http.Request, user database.User) {
-	delUser, err := apicfg.DB.DelUser(r.Context(), user.ID)
-
-	if err != nil {
-		responseWithError(w, http.StatusInternalServerError, fmt.Sprintf("cannot delete user: %v", err))
-		return
-	}
-
-	responseWithJSON(w, http.StatusOK, delUser)
-}

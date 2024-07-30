@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -42,14 +41,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.ApiKey,
 	)
 	return i, err
-}
-
-const delUser = `-- name: DelUser :execresult
-DELETE FROM users WHERE id = $1
-`
-
-func (q *Queries) DelUser(ctx context.Context, id uuid.UUID) (sql.Result, error) {
-	return q.db.ExecContext(ctx, delUser, id)
 }
 
 const getAllUsers = `-- name: GetAllUsers :many

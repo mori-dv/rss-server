@@ -8,6 +8,3 @@ SELECT * From users where api_key = $1;
 
 -- name: GetAllUsers :many
 SELECT * FROM users;
-
--- name: DelUser :execresult
-DELETE FROM users WHERE id = $1;
