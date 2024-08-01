@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -22,8 +23,11 @@ type apiConfig struct {
 func main() {
 
 	fmt.Println("Start Program...")
-
-	err := godotenv.Load(".env")
+	pwd, er := os.Getwd()
+	if er != nil {
+		log.Fatal(er)
+	}
+	err := godotenv.Load(filepath.Join(pwd, ".env"))
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -47,7 +51,7 @@ func main() {
 	apicfg := apiConfig{
 		DB: db,
 	}
-	go startScraping(db, 10, time.Second*15)
+	go startScraping(db, 10, time.Minute)
 
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
@@ -75,6 +79,7 @@ func main() {
 	v1Router.Get("/feed/follows", apicfg.middlewareAuth(apicfg.handlerGetAllFeedFollows))
 	v1Router.Delete("/feed/follow/delete/{feedFollowsID}", apicfg.middlewareAuth(apicfg.handlerDeleteFeedFollows))
 	v1Router.Get("/posts", apicfg.middlewareAuth(apicfg.handlerGetPostsForUser))
+
 	router.Mount("/v1", v1Router)
 
 	server := &http.Server{
