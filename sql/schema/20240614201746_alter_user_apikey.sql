@@ -8,7 +8,7 @@ SELECT 'up SQL query';
     );
 
 -- +goose Down
-    ALTER TABLE users DROP COLUMN api_key;
 -- +goose StatementBegin
 SELECT 'down SQL query';
 -- +goose StatementEnd
+ALTER TABLE users DROP COLUMN api_key;
