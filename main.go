@@ -23,11 +23,12 @@ type apiConfig struct {
 func main() {
 
 	fmt.Println("Start Program...")
-	pwd, er := os.Getwd()
-	if er != nil {
-		log.Fatal(er)
+	baseDir := os.Getenv("BASE_DIR")
+	if baseDir == "" {
+		log.Fatal("BASE DIR variable not assigned!")
 	}
-	err := godotenv.Load(filepath.Join(pwd, ".env"))
+	fmt.Println(baseDir)
+	err := godotenv.Load(filepath.Join(baseDir, ".env"))
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
