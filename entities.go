@@ -2,10 +2,10 @@ package main
 
 type Webhook struct {
 	Ok     bool     `json:"ok"`
-	Result []Result `json:"result"`
+	Result []Update `json:"result"`
 }
 
-type Result struct {
+type Update struct {
 	UpdateId int     `json:"update_id"`
 	Msg      Message `json:"message"`
 }

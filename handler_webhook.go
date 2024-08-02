@@ -9,10 +9,11 @@ import (
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
 
 	decoder := json.NewDecoder(r.Body)
-	webhook := Webhook{}
-	err := decoder.Decode(&webhook)
+	Update := Update{}
+	err := decoder.Decode(&Update)
 	if err != nil {
 		responseWithError(w, http.StatusBadRequest, err.Error())
 	}
-	fmt.Println(webhook)
+	fmt.Println(Update)
+	responseWithJSON(w, http.StatusOK, Update)
 }
