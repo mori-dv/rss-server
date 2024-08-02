@@ -80,7 +80,7 @@ func main() {
 	v1Router.Get("/feed/follows", apicfg.middlewareAuth(apicfg.handlerGetAllFeedFollows))
 	v1Router.Delete("/feed/follow/delete/{feedFollowsID}", apicfg.middlewareAuth(apicfg.handlerDeleteFeedFollows))
 	v1Router.Get("/posts", apicfg.middlewareAuth(apicfg.handlerGetPostsForUser))
-	v1Router.Post("/webhook", webhookHandler)
+	v1Router.Post("/webhook", apicfg.middlewareAuth(apicfg.webhookHandler))
 
 	router.Mount("/v1", v1Router)
 
