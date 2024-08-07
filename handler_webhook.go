@@ -1,14 +1,12 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/mori-dv/RSS/internal/database"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -20,10 +18,10 @@ func (apicfg *apiConfig) webhookHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		responseWithError(w, http.StatusBadRequest, err.Error())
 	}
-	var chatId int64
-	chatId = Update.Msg.ChatDetail.Id
+
+	chatId := Update.Msg.ChatDetail.Id
 	lastPosts, dbErr := apicfg.DB.GetPostsForTelUser(r.Context(), database.GetPostsForTelUserParams{
-		TelID: sql.NullString{String: strconv.FormatInt(chatId, 10)},
+		TelID: chatId,
 		Limit: 10,
 	})
 	if dbErr != nil {
