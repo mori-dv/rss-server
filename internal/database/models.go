@@ -46,4 +46,6 @@ type User struct {
 	UpdatedAt time.Time
 	Name      string
 	ApiKey    string
+	IsAdmin   interface{}
+	TelID     string
 }

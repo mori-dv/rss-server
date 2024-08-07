@@ -12,10 +12,27 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkAdmin = `-- name: CheckAdmin :one
+SELECT name, api_key, is_admin FROM users WHERE id=$1
+`
+
+type CheckAdminRow struct {
+	Name    string
+	ApiKey  string
+	IsAdmin interface{}
+}
+
+func (q *Queries) CheckAdmin(ctx context.Context, id uuid.UUID) (CheckAdminRow, error) {
+	row := q.db.QueryRowContext(ctx, checkAdmin, id)
+	var i CheckAdminRow
+	err := row.Scan(&i.Name, &i.ApiKey, &i.IsAdmin)
+	return i, err
+}
+
 const createUser = `-- name: CreateUser :one
-INSERT INTO users(id, created_at, updated_at, name, api_key)
-VALUES ($1, $2, $3, $4, encode(sha256(random()::text::bytea), 'hex') )
-RETURNING id, created_at, updated_at, name, api_key
+INSERT INTO users(id, created_at, updated_at, name, api_key, is_admin, tel_id)
+VALUES ($1, $2, $3, $4, encode(sha256(random()::text::bytea), 'hex'), $5, $6)
+RETURNING id, created_at, updated_at, name, api_key, is_admin, tel_id
 `
 
 type CreateUserParams struct {
@@ -23,6 +40,8 @@ type CreateUserParams struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string
+	IsAdmin   interface{}
+	TelID     string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -31,6 +50,8 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.Name,
+		arg.IsAdmin,
+		arg.TelID,
 	)
 	var i User
 	err := row.Scan(
@@ -39,12 +60,49 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.UpdatedAt,
 		&i.Name,
 		&i.ApiKey,
+		&i.IsAdmin,
+		&i.TelID,
 	)
 	return i, err
 }
 
+const getAdminUsers = `-- name: GetAdminUsers :many
+SELECT id, created_at, updated_at, name, api_key, is_admin, tel_id FROM users WHERE is_admin=1
+`
+
+func (q *Queries) GetAdminUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getAdminUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Name,
+			&i.ApiKey,
+			&i.IsAdmin,
+			&i.TelID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAllUsers = `-- name: GetAllUsers :many
-SELECT id, created_at, updated_at, name, api_key FROM users
+SELECT id, created_at, updated_at, name, api_key, is_admin, tel_id FROM users
 `
 
 func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
@@ -62,6 +120,8 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
 			&i.UpdatedAt,
 			&i.Name,
 			&i.ApiKey,
+			&i.IsAdmin,
+			&i.TelID,
 		); err != nil {
 			return nil, err
 		}
@@ -76,8 +136,19 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
 	return items, nil
 }
 
+const getTelegramIdUser = `-- name: GetTelegramIdUser :one
+SELECT tel_id FROM users WHERE id=$1
+`
+
+func (q *Queries) GetTelegramIdUser(ctx context.Context, id uuid.UUID) (string, error) {
+	row := q.db.QueryRowContext(ctx, getTelegramIdUser, id)
+	var tel_id string
+	err := row.Scan(&tel_id)
+	return tel_id, err
+}
+
 const getUser = `-- name: GetUser :one
-SELECT id, created_at, updated_at, name, api_key From users where api_key = $1
+SELECT id, created_at, updated_at, name, api_key, is_admin, tel_id From users where api_key = $1
 `
 
 func (q *Queries) GetUser(ctx context.Context, apiKey string) (User, error) {
@@ -89,6 +160,8 @@ func (q *Queries) GetUser(ctx context.Context, apiKey string) (User, error) {
 		&i.UpdatedAt,
 		&i.Name,
 		&i.ApiKey,
+		&i.IsAdmin,
+		&i.TelID,
 	)
 	return i, err
 }

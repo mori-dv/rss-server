@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -25,12 +26,18 @@ func (apicfg *apiConfig) webhookHandler(w http.ResponseWriter, r *http.Request, 
 		responseWithError(w, http.StatusBadRequest, dbErr.Error())
 	}
 
-	fmt.Println(lastPosts)
-
 	if dbErr != nil {
 		return
 	}
+
 	chatId := Update.Msg.ChatDetail.Id
+
+	user.TelID = strconv.FormatInt(chatId, 10)
+
+	SendMessageToTelegramBot(user.TelID, SendMessage{msg: "this is an alert for you"})
+
+	fmt.Println(lastPosts)
+
 	if chatId != 0 {
 		responseWithError(w, http.StatusBadRequest, "You can't send messages to this chat")
 	}
@@ -38,9 +45,10 @@ func (apicfg *apiConfig) webhookHandler(w http.ResponseWriter, r *http.Request, 
 }
 
 type SendMessage struct {
+	msg string
 }
 
-func SendMessageToTelegramBot(chatID int64, msg SendMessage) {
+func SendMessageToTelegramBot(chatID string, msg SendMessage) {
 	client := &http.Client{
 		Timeout: 5 * time.Second,
 	}
