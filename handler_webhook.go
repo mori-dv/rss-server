@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -32,9 +31,7 @@ func (apicfg *apiConfig) webhookHandler(w http.ResponseWriter, r *http.Request, 
 
 	chatId := Update.Msg.ChatDetail.Id
 
-	user.TelID = strconv.FormatInt(chatId, 10)
-
-	SendMessageToTelegramBot(user.TelID, SendMessage{msg: "this is an alert for you"})
+	SendMessageToTelegramBot(chatId, SendMessage{msg: "this is an alert for you"})
 
 	fmt.Println(lastPosts)
 
@@ -48,7 +45,7 @@ type SendMessage struct {
 	msg string
 }
 
-func SendMessageToTelegramBot(chatID string, msg SendMessage) {
+func SendMessageToTelegramBot(chatID int64, msg SendMessage) {
 	client := &http.Client{
 		Timeout: 5 * time.Second,
 	}
