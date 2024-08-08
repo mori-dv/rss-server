@@ -3,12 +3,47 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mori-dv/RSS/internal/database"
 	"log"
 	"net/http"
 	"os"
 	"time"
 )
+
+//func (apicfg *apiConfig) webhookHandler(w http.ResponseWriter, r *http.Request) {
+//
+//	decoder := json.NewDecoder(r.Body)
+//	Update := Update{}
+//	err := decoder.Decode(&Update)
+//	if err != nil {
+//		responseWithError(w, http.StatusBadRequest, err.Error())
+//	}
+//
+//	chatId := Update.Msg.ChatDetail.Id
+//	lastPosts, dbErr := apicfg.DB.GetPostsForTelUser(r.Context(), database.GetPostsForTelUserParams{
+//		TelID: int32(chatId),
+//		Limit: 10,
+//	})
+//	if dbErr != nil {
+//		responseWithError(w, http.StatusBadRequest, dbErr.Error())
+//	}
+//
+//	if dbErr != nil {
+//		return
+//	}
+//
+//	SendMessageToTelegramBot(chatId, SendMessage{msg: "this is an alert for you"})
+//
+//	fmt.Println(lastPosts)
+//
+//	if chatId != 0 {
+//		responseWithError(w, http.StatusBadRequest, "You can't send messages to this chat")
+//	}
+//	responseWithJSON(w, http.StatusOK, Update)
+//}
+
+type SendMessage struct {
+	msg string
+}
 
 func (apicfg *apiConfig) webhookHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -20,30 +55,27 @@ func (apicfg *apiConfig) webhookHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	chatId := Update.Msg.ChatDetail.Id
-	lastPosts, dbErr := apicfg.DB.GetPostsForTelUser(r.Context(), database.GetPostsForTelUserParams{
-		TelID: chatId,
-		Limit: 10,
-	})
-	if dbErr != nil {
-		responseWithError(w, http.StatusBadRequest, dbErr.Error())
-	}
-
-	if dbErr != nil {
-		return
-	}
-
-	SendMessageToTelegramBot(chatId, SendMessage{msg: "this is an alert for you"})
-
-	fmt.Println(lastPosts)
-
-	if chatId != 0 {
-		responseWithError(w, http.StatusBadRequest, "You can't send messages to this chat")
-	}
-	responseWithJSON(w, http.StatusOK, Update)
-}
-
-type SendMessage struct {
-	msg string
+	fmt.Println(chatId)
+	fmt.Println(Update)
+	//lastPosts, dbErr := apicfg.DB.GetPostsForTelUser(r.Context(), database.GetPostsForTelUserParams{
+	//	TelID: int32(chatId),
+	//	Limit: 10,
+	//})
+	//if dbErr != nil {
+	//	responseWithError(w, http.StatusBadRequest, dbErr.Error())
+	//}
+	//
+	//if dbErr != nil {
+	//	return
+	//}
+	//
+	////SendMessageToTelegramBot(chatId, SendMessage{msg: "this is an alert for you"})
+	//
+	//fmt.Println(lastPosts)
+	//
+	//if chatId != 0 {
+	//	responseWithError(w, http.StatusBadRequest, "You can't send messages to this chat")
+	//}
 }
 
 func SendMessageToTelegramBot(chatID int64, msg SendMessage) {
