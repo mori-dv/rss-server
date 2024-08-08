@@ -13,6 +13,7 @@ import (
 
 func startScraping(db *database.Queries, concurrency int, timeBetweenRequest time.Duration) {
 	log.Printf("Scraping starting on %v goroutines every %s duration \n", concurrency, timeBetweenRequest)
+	getUpdatesTelegram()
 	ticker := time.NewTicker(timeBetweenRequest)
 	for ; ; <-ticker.C {
 		feeds, err := db.GetNextFeedsToFetch(context.Background(), int32(concurrency))
