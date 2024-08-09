@@ -35,13 +35,16 @@ func getUpdatesTelegram() {
 		return
 	}
 	log.Println("telegram Updates response: ")
-	log.Println(resp)
-	var response Update
+	log.Println(resp.Body)
+	var response Webhook
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
 		return
 	}
-	chatId := response.Msg.ChatDetail.Id
+	log.Println("Updates response response as Update: ")
+	log.Println(response)
+
+	//chatId := response.Msg.ChatDetail.Id
 	//lastPosts, dbErr := apicfg.DB.GetPostsForTelUser(r.Context(), database.GetPostsForTelUserParams{
 	//	TelID: int32(chatId),
 	//	Limit: 10,
@@ -51,9 +54,9 @@ func getUpdatesTelegram() {
 	//	return
 	//}
 
-	SendMessageToTelegramBot(chatId, SendMessage{msg: "this is an alert for you"})
-
-	log.Println(chatId)
+	//SendMessageToTelegramBot(chatId, SendMessage{msg: "this is an alert for you"})
+	//
+	//log.Println(chatId)
 
 }
 
