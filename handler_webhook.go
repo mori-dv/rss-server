@@ -6,22 +6,19 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 )
 
 func getUpdatesTelegram() {
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
-	botApiToken := os.Getenv("TELEGRAM_BOT_API_TOKEN")
+	botApiToken := os.Getenv("TELEGRAM_API_TOKEN")
 	if botApiToken == "" {
-		log.Println("TELEGRAM_BOT_API_TOKEN environment variable not set")
+		log.Println("TELEGRAM_API_TOKEN environment variable not set")
 		return
 	}
 	url := fmt.Sprintf(
 		"https://api.telegram.org/bot%v/getUpdates", botApiToken,
 	)
-	resp, err := client.Get(url)
+	log.Println("Getting Update From telegram...")
+	resp, err := http.Get(url)
 	if err != nil {
 		return
 	}
@@ -51,18 +48,15 @@ type SendMessage struct {
 }
 
 func SendMessageToTelegramBot(chatID int64, msg SendMessage) {
-	client := &http.Client{
-		Timeout: 5 * time.Second,
-	}
-	botApiToken := os.Getenv("TELEGRAM_BOT_API_TOKEN")
+	botApiToken := os.Getenv("TELEGRAM_API_TOKEN")
 	if botApiToken == "" {
-		log.Println("TELEGRAM_BOT_API_TOKEN environment variable not set")
+		log.Println("TELEGRAM_API_TOKEN environment variable not set")
 		return
 	}
 	url := fmt.Sprintf(
 		"https://api.telegram.org/bot%v/sendMessage?chat_id=%v&message=%v", botApiToken, chatID, msg,
 	)
-	response, err := client.Get(url)
+	response, err := http.Get(url)
 	if err != nil {
 		return
 	}

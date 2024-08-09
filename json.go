@@ -24,8 +24,8 @@ func responseWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 		w.WriteHeader(500)
 		return
 	}
-	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
+	w.Header().Add("Content-Type", "application/json")
 	_, err = w.Write(data)
 	if err != nil {
 		log.Printf("Failed to write header: %v\n", err)
