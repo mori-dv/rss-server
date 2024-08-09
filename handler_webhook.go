@@ -39,6 +39,7 @@ func getUpdatesTelegram() {
 	var response Webhook
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
+		log.Fatal(err)
 		return
 	}
 	log.Println("Updates response response as Update: ")
