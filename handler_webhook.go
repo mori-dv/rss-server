@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 )
 
@@ -14,14 +15,27 @@ func getUpdatesTelegram() {
 		log.Println("TELEGRAM_API_TOKEN environment variable not set")
 		return
 	}
-	url := fmt.Sprintf(
+	log.Println("Getting Update From telegram...")
+	targetUrl := fmt.Sprintf(
 		"https://api.telegram.org/bot%v/getUpdates", botApiToken,
 	)
-	log.Println("Getting Update From telegram...")
-	resp, err := http.Get(url)
+	client := &http.Client{
+		Transport: &http.Transport{
+			Proxy: http.ProxyURL(&url.URL{
+				Scheme: "http",
+				Host:   "127.0.0.1:8880",
+			}),
+		},
+	}
+	//proxyUrl, err := url.Parse("http://proxyIp:proxyPort")
+	//myClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
+
+	resp, err := client.Get(targetUrl)
 	if err != nil {
 		return
 	}
+	log.Println("telegram Updates response: ")
+	log.Println(resp)
 	var response Update
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
