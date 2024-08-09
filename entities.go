@@ -20,7 +20,7 @@ type Message struct {
 	MessageId  int64  `json:"message_id"`
 	FromDetail From   `json:"from"`
 	ChatDetail Chat   `json:"chat"`
-	Date       string `json:"date"`
+	Date       int    `json:"date"`
 	Text       string `json:"text"`
 	Entities   Entity `json:"entities"`
 }
